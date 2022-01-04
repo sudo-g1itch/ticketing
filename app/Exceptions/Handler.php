@@ -4,6 +4,8 @@ namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+use Illuminate\Auth\AuthenticationException;
+use Aacotroneo\Saml2\Saml2Auth;
 
 class Handler extends ExceptionHandler
 {
@@ -26,6 +28,18 @@ class Handler extends ExceptionHandler
         'password',
         'password_confirmation',
     ];
+
+    protected function unauthenticated($request, AuthenticationException $exception)
+    {
+        if ($request->expectsJson())
+        {
+            return response()->json(['error' => 'Unauthenticated.'], 401); // Or, return a response that causes client side js to redirect to '/routesPrefix/myIdp1/login'
+        }
+            return redirect('http://slayvault.saaslay.test/home#/list');
+            
+        $saml2Auth = new Saml2Auth(Saml2Auth::loadOneLoginAuthFromIpdConfig('slayvault'));
+        return $saml2Auth->login('slayvault/login');
+    }
 
     /**
      * Register the exception handling callbacks for the application.

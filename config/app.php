@@ -2,6 +2,10 @@
 
 return [
 
+    'subdomain' =>env('APP_SUBDOMAIN'),
+    
+    'service_id' => env('APP_SERVICE_ID'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name
@@ -161,6 +165,7 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
+        Aacotroneo\Saml2\Saml2ServiceProvider::class,
 
         /*
          * Package Service Providers...

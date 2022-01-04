@@ -17,20 +17,32 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
 
-require __DIR__.'/auth.php';
+Route::prefix('client')->group(function () {
+    Route::middleware(['auth:client_guard'])->group(function () {
+        Route::get('/', function () {
+            return view('welcome');
+        });
+        Route::get('/create-ticket', [App\Http\Controllers\TicketController::class, 'create']); 
+        Route::get('/view-all-tickets', [App\Http\Controllers\TicketController::class, 'indexAll']); 
+    });
+});
 
-Route::get('/create-ticket', [App\Http\Controllers\TicketController::class, 'create']); 
 Route::post('/tickets/store', [App\Http\Controllers\TicketController::class, 'store']);
 Route::post('/comment/store/{id}', [App\Http\Controllers\CommentController::class, 'store']);
-Route::get('/view-all-tickets', [App\Http\Controllers\TicketController::class, 'indexAll']); 
 Route::get('/view/{id}', [App\Http\Controllers\TicketController::class, 'show']); 
+// Auth::routes();
 
-
-Route::middleware(['auth'])->group(function () {
-    Route::get('/view-tickets', [App\Http\Controllers\TicketController::class, 'index']); 
-    Route::get('/edit/{id}', [App\Http\Controllers\TicketController::class, 'edit']); 
+Route::post('logout', [App\Http\Controllers\Auth\LoginController::class , 'logout'])->name('logout');
+Route::get('login-user', [App\Http\Controllers\Auth\LoginController::class , 'login'])->name('login-user');
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/error', function (){
+     return response()->json('failed');
 });
+
+
+
+
+Route::get('/view-tickets', [App\Http\Controllers\TicketController::class, 'index']); 
+Route::get('/edit/{id}', [App\Http\Controllers\TicketController::class, 'edit']); 
+
