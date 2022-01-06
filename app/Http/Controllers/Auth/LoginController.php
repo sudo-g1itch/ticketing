@@ -7,6 +7,7 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use App\Models\Client;
+use App\Models\User;
 
 class LoginController extends Controller
 {
@@ -41,7 +42,8 @@ class LoginController extends Controller
     }
 
     public function login(Request $request){
-        if( $request->get('key') == 'thekey'){
+        $owner_cuuid = $request->get('key');
+        if($owner = User::where('c_uuid', $owner_cuuid)->first()){
             $user = Client::where('name',$request->get('name'))->where('uuid', $request->get('uuid'))->first();
             if($user){
                 \Auth::guard('client_guard')->loginUsingId($user->id);
@@ -51,11 +53,15 @@ class LoginController extends Controller
                 $client = new Client;
                 $client->name = $request->get('name');
                 $client->company = $request->get('company');
-                $client->ownership_id = 1;
-                $client->uuid = \Str::random(128);
+                $client->ownership_id = $owner->id;
+                $client->uuid = \Str::uuid(128);
                 $client->save();
                 \Auth::guard('client_guard')->loginUsingId($client->id);
                 $request->session()->regenerate();
+
+
+                event(new \App\Events\GuestCreated($client));
+
                 return redirect()->intended('client');
             }
         }
