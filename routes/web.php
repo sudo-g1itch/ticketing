@@ -46,3 +46,4 @@ Route::get('/error', function (){
 Route::get('/view-tickets', [App\Http\Controllers\TicketController::class, 'index']); 
 Route::get('/edit/{id}', [App\Http\Controllers\TicketController::class, 'edit']); 
 
+Route::get('/support', [App\Http\Controllers\CommentController::class, 'support']);
